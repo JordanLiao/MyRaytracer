@@ -13,7 +13,7 @@ public:
 	Resources::Material* material;
 	std::vector<Triangle> triangles;
 
-	Mesh(std::string& name, Resources::Material* mtl);
+	Mesh(const std::string& name, Resources::Material* mtl);
 	~Mesh();
 };
 

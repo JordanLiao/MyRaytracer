@@ -1,8 +1,33 @@
-﻿  Camera.cpp
-  Main.cpp
-  RTRenderer.cpp
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(56,60): warning C4244: 'argument': conversion from 'float' to 'const uint8_t', possible loss of data
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(56,45): warning C4244: 'argument': conversion from 'float' to 'const uint8_t', possible loss of data
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(56,30): warning C4244: 'argument': conversion from 'float' to 'const uint8_t', possible loss of data
-  Generating Code...
+﻿  RTRenderer.cpp
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(40,36): warning C4018: '<': signed/unsigned mismatch
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(122,59): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(122,44): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(122,29): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(151,59): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(151,44): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
+D:\csHobby\MyRayTracer\src\RTRenderer.cpp(151,29): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
+          with
+          [
+              T=float
+          ]
   MyRayTracer.vcxproj -> D:\csHobby\MyRayTracer\x64\Debug\MyRayTracer.exe

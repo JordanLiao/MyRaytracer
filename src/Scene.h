@@ -4,11 +4,13 @@
 #include <vector>
 #include "Triangle.h"
 #include "Light.h"
+#include "QuadLight.h"
 #include "ResourceManager.h"
 
 class Scene {
 public:
 	Light light;
+	QuadLight quadlight;
 	std::vector<Object*> objects;
 
 	Scene();

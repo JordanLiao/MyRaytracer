@@ -17,7 +17,7 @@ public:
 	glm::mat4 model;
 	std::vector<Mesh*> meshList; //might want to use a different data structure for efficiencys
 
-	Object(std::string& objFileName, glm::mat4 model);
+	Object(const std::string& objFileName, glm::mat4 model);
 	~Object();
 };
 

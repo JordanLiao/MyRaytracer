@@ -17,7 +17,7 @@ public:
 		raySource: 3D position of the source of the supplied ray
 		ray:: 3d direction of the ray
 	*/
-	float intersect(glm::vec3& raySource, glm::vec3& ray);
+	float intersect(glm::vec3& baryCenter, const glm::vec3& raySource, const glm::vec3& ray);
 
 private:
 	//used for Barycentric Coordinates calculations

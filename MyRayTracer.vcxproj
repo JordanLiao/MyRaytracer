@@ -92,6 +92,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\QuadLight.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Resources.cpp" />
     <ClCompile Include="src\RTRenderer.cpp" />
@@ -478,6 +479,7 @@
     <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Object.h" />
+    <ClInclude Include="src\QuadLight.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Resources.h" />
     <ClInclude Include="src\RTRenderer.h" />

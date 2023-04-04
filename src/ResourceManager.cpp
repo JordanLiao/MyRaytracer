@@ -11,7 +11,8 @@ Object* ResourceManager::loadObject(const char* fPath) {
 	}
 
 	Assimp::Importer imp;
-	const aiScene* pScene = imp.ReadFile(fPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals);
+	const aiScene* pScene = imp.ReadFile(fPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals 
+		| aiProcess_JoinIdenticalVertices | aiProcess_FixInfacingNormals | aiProcess_PreTransformVertices);
 	if (pScene == nullptr) {
 		printf("Error parsing '%s': '%s'\n", fPath, imp.GetErrorString());
 		return nullptr;

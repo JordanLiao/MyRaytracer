@@ -1,6 +1,6 @@
 #include "Object.h"
 
-Object::Object(std::string& objFileName, glm::mat4 model) {
+Object::Object(const std::string& objFileName, glm::mat4 model) {
     this->objFileName = objFileName;
     this->model = model;
 }

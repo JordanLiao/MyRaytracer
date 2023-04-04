@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::string& name, Resources::Material* mtl) {
+Mesh::Mesh(const std::string& name, Resources::Material* mtl) {
     meshName = name;
     material = mtl;
 }
