@@ -28,11 +28,19 @@ Camera::Camera(glm::vec3 pos, glm::vec3 lookAt, float aspectRatio, float vfov, u
 	this->height = height;
 }
 
-void Camera::generateRay(unsigned int x, unsigned int y, glm::vec3& ray) {
+glm::vec3 Camera::generateCenterAlignedRay(unsigned int x, unsigned int y) {
 	//float x and y in NDC, -1 to 1; y value is flipped since screen space is upside down
-	float xf = (2.f * ((float)x + 0.5f) / (float)width - 1.f) * tangent * aspectRatio; //plus 0.5 to start from the center of a pixel
+	float xf = (2.f * ((float)x + 0.5f) / (float)width - 1.f) * tangent * aspectRatio; //plus 0.5 to shoot through the center of a pixel
 	float yf = (1.f - 2.f * ((float)y + 0.5f) / (float)height) * tangent;
 	glm::vec4 ray0 = viewInverse * glm::vec4(xf, yf, -1.f, 1.f);
-	ray = glm::normalize(ray0 - worldOriginInverse);
+	return glm::normalize(ray0 - worldOriginInverse);
+}
+
+glm::vec3 Camera::generateRay(float x, float y) {
+	//float x and y in NDC, -1 to 1; y value is flipped since screen space is upside down
+	float xf = (2.f * x / (float)width - 1.f) * tangent * aspectRatio;
+	float yf = (1.f - 2.f * y / (float)height) * tangent;
+	glm::vec4 ray0 = viewInverse * glm::vec4(xf, yf, -1.f, 1.f);
+	return glm::normalize(ray0 - worldOriginInverse);
 }
 
