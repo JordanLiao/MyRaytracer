@@ -139,7 +139,7 @@ glm::vec3 RTRenderer::integrate(unsigned int depth, const Intersect& intersect, 
 		glm::vec3 incidence = glm::normalize(samplePoint - intersect.point);
 		float lightDist = glm::length(samplePoint - intersect.point);
 		if (!trace(obstruction, intersect.point, incidence, objects) || (lightDist < obstruction.distance + 0.00001f)) {
-			integral += phongBRDF(incidence, -1.f * ray, intersect.normal, intersect.mtl) * 
+			integral += phongBRDF(incidence, ray, intersect.normal, intersect.mtl) * 
 				        glm::dot(intersect.normal, incidence) * //n . w_i
 				        glm::dot(-1.f * quad.normal, incidence) //-n_l . w_i
 					    / (lightDist * lightDist);
@@ -167,10 +167,10 @@ glm::vec3 RTRenderer::integrate(unsigned int depth, const Intersect& intersect, 
 		
 			if (trace(obstruction, intersect.point, sampledDir, objects)) {
 				float pd = getBRDFPD(sampledDir, intersect.normal, reflection, intersect.mtl->specularFocus, reflectiveness);
-				glm::vec3 brdf = phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl);
+				glm::vec3 brdf = phongBRDF(sampledDir, ray, intersect.normal, intersect.mtl);
 				glm::vec3 Li = integrate(depth - 1, obstruction, sampledDir, quad, objects);
 				float dot = glm::dot(sampledDir, intersect.normal);
-				indirectRadiance += phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl)
+				indirectRadiance += phongBRDF(sampledDir, ray, intersect.normal, intersect.mtl)
 					* integrate(depth - 1, obstruction, sampledDir, quad, objects)
 				    * glm::dot(sampledDir, intersect.normal) / pd;
 			}

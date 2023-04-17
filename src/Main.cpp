@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
 	int width = 3;
 	int height = 3;
 #else 
-	int width = 600;
-	int height = 900;
+	int width = 900;
+	int height = 600;
 #endif
 
 	rayTest(&scene);

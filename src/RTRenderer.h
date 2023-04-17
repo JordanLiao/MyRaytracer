@@ -17,7 +17,7 @@
 #define NUM_QUAD_SAMPLES_SQRT 1 //square root of number of samples from a quad light: NUM_SAMPLES_SQRT ^ 2
 
 #define _MULTI_PIXEL_SAMPLES_
-#define NUM_PIXEL_SAMPLES_SQRT 6 //square root of number of samples from a pixel
+#define NUM_PIXEL_SAMPLES_SQRT 8 //square root of number of samples from a pixel
 
 #ifndef _DEBUG
 #define _MULTITHREADED_
@@ -26,8 +26,8 @@
 #define NUM_THREADS 1
 #endif
 
-#define RT_DEPTH 2 //depth of ray tracing
-#define NUM_INTERSECT_SAMPLES 1 //how many secondary rays to sample for each intersection
+#define RT_DEPTH 3 //depth of ray tracing
+#define NUM_INTERSECT_SAMPLES 2 //how many secondary rays to sample for each intersection
 
 struct Intersect {
 	glm::vec3 point;
