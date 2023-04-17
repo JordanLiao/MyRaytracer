@@ -8,30 +8,47 @@
 #include "tgaimage.h"
 #include "QuadLight.h"
 
+//indirect light sampling method
+#define _BRDF_SAMPLING_
+//#ifndef _BRDF_SAMPLING_
+//#define _COSINE_SAMPLING_
+//#endif
+
 #define NUM_QUAD_SAMPLES_SQRT 1 //square root of number of samples from a quad light: NUM_SAMPLES_SQRT ^ 2
 
 #define _MULTI_PIXEL_SAMPLES_
-#define NUM_PIXEL_SAMPLES_SQRT 7 //square root of number of samples from a pixel
+#define NUM_PIXEL_SAMPLES_SQRT 6 //square root of number of samples from a pixel
 
+#ifndef _DEBUG
 #define _MULTITHREADED_
 #define NUM_THREADS 12
+#else
+#define NUM_THREADS 1
+#endif
 
-#define RT_DEPTH 3 //depth of ray tracing
-#define NUM_INTERSECT_SAMPLES 10 //how many secondary rays to sample for each intersection
+#define RT_DEPTH 2 //depth of ray tracing
+#define NUM_INTERSECT_SAMPLES 1 //how many secondary rays to sample for each intersection
 
 struct Intersect {
-	float distance;
 	glm::vec3 point;
 	glm::vec3 normal;
-	glm::vec3 baryCenter;
-	Triangle* triangle;
+	float distance;
 	Resources::Material * mtl;
+
+#ifdef _DEBUG
+	std::string* name;
+#endif
+};
+
+enum class ObjectType {
+	triangle,
+	sphere,
 };
 
 class RTRenderer {
 public:
 	static void render(TGAImage& outputFrame, Scene* scene, Camera& cam);
-private:
+
 	static void renderOnThread(TGAImage& outputFrame, Scene* scene, Camera& cam, int startRow, int endRow);
 
 	/*
@@ -64,9 +81,25 @@ private:
 		                            const glm::vec3& normal, Resources::Material* mtl, QuadLight& quad);
 
 	/*
-		uniformly and randomly sample a direction on a hemisphere centered around a given normal 
+		convert unit spherical coordinates theta and phi to directional vector on a hemisphere centered 
+		around the given normal.
+	*/
+	static glm::vec3 toHemisphericalDirection(float theta, float phi, const glm::vec3& normal);
+
+	static glm::vec3 getBRDFImportanceSample(const glm::vec3& normal, const glm::vec3& reflection, float reflectiveness, float specularFocus);
+
+	//get the probability density for BRDF importance sampling
+	static float getBRDFPD(const glm::vec3& wi, const glm::vec3& normal,
+		                   const glm::vec3& reflection, float specularFocus, float reflectiveness);
+
+	/*
+		uniformly sample a direction on a hemisphere centered around a given normal 
 	*/
 	static glm::vec3 getHemisphericalSample(const glm::vec3 & normal);
+
+	static glm::vec3 getCosineWeightedSample(const glm::vec3& normal);
+
+	static float getUniformSample();
 };
 
 #endif

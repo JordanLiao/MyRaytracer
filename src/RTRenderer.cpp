@@ -17,14 +17,7 @@ void RTRenderer::render(TGAImage& outputFrame, Scene* scene, Camera& cam) {
 	for (int i = 0; i < NUM_THREADS; i++)
 		threads[i].join();
 #else
-	unsigned int width = cam.width, height = cam.height;
-	for (unsigned int i = 0; i < height; i++) {
-		for (unsigned int j = 0; j < width; j++) {
-			glm::vec3 color = castRay(cam.generateRay(j, i), scene, cam);
-			TGAColor pixelColor = TGAColor(255 * color.r, 255 * color.g, 255 * color.b, 255);
-			outputFrame.set(j, height - i - 1, pixelColor);
-		}
-	}
+	renderOnThread(outputFrame, scene, cam, 0, cam.height);
 #endif
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -57,7 +50,7 @@ void RTRenderer::renderOnThread(TGAImage& outputFrame, Scene* scene, Camera& cam
 
 glm::vec3 RTRenderer::castRay(const glm::vec3& ray, Scene* scene, Camera& cam) {
 	Intersect intersect;
-	if (trace(intersect, cam.pos, ray, scene->objects)) { //if a triangle is hit
+	if (trace(intersect, cam.pos, ray, scene->objects)) {
 		return shade(ray, intersect, scene);
 	}
 	return glm::vec3(0.f);
@@ -66,6 +59,13 @@ glm::vec3 RTRenderer::castRay(const glm::vec3& ray, Scene* scene, Camera& cam) {
 bool RTRenderer::trace(Intersect& intersect, const glm::vec3& raySource, const glm::vec3& ray, std::vector<Object*> objects) {
 	//naive implementation of tracing without accelaration structure
 	float rayLength = FLT_MAX;
+	glm::vec3 baryCenter;
+
+	ObjectType objType;
+	Triangle* hitTriangle = nullptr;
+	Sphere* hitSphere = nullptr;
+
+
 	size_t numObj = objects.size();
 	for (size_t i = 0; i < numObj; i++) {
 		size_t numMesh = objects[i]->meshList.size();
@@ -75,25 +75,47 @@ bool RTRenderer::trace(Intersect& intersect, const glm::vec3& raySource, const g
 				glm::vec3 bCenter;
 				float dist = objects[i]->meshList[j]->triangles[k].intersect(bCenter, raySource, ray);
 				if (dist < rayLength) {
+					objType = ObjectType::triangle;
 					rayLength = dist;
-					intersect.baryCenter = bCenter;
-					intersect.triangle = &(objects[i]->meshList[j]->triangles[k]);
+					baryCenter = bCenter;
+					hitTriangle = &(objects[i]->meshList[j]->triangles[k]);
 					intersect.mtl = objects[i]->meshList[j]->material;
+
+#ifdef _DEBUG
+					intersect.name = &objects[i]->objFileName;
+#endif
+
 				}
+			}
+		}
+		
+		if (objects[i]->sphere) {
+			float dist = objects[i]->sphere->intersect(raySource, ray);
+			if (dist < rayLength) {
+				objType = ObjectType::sphere;
+				rayLength = dist;
+				hitSphere = objects[i]->sphere;
+				intersect.mtl = hitSphere->material;
+#ifdef _DEBUG
+				intersect.name = &objects[i]->objFileName;
+#endif
 			}
 		}
 	}
 
-	if (rayLength == FLT_MAX)
+	if (rayLength == FLT_MAX) {
 		return false;
-	else {
-		intersect.point = raySource + rayLength * ray;
-		intersect.distance = rayLength;
-		intersect.normal = glm::normalize(intersect.triangle->normals[0] * intersect.baryCenter[0] +
-							intersect.triangle->normals[1] * intersect.baryCenter[1] +
-							intersect.triangle->normals[2] * intersect.baryCenter[2]);
-		return true;
 	}
+	intersect.point = raySource + rayLength * ray;
+	intersect.distance = rayLength;
+	if(objType == ObjectType::triangle){
+		intersect.normal = glm::normalize(hitTriangle->normals[0] * baryCenter[0] +
+							              hitTriangle->normals[1] * baryCenter[1] +
+							              hitTriangle->normals[2] * baryCenter[2]);
+	} else {
+		intersect.normal = glm::normalize(intersect.point - hitSphere->position);
+	}
+	return true;
 }
 
 glm::vec3 RTRenderer::shade(const glm::vec3& ray, Intersect& intersect, Scene* scene) {
@@ -108,21 +130,19 @@ glm::vec3 RTRenderer::integrate(unsigned int depth, const Intersect& intersect, 
 
 	//direct lighting
 	Intersect obstruction;
-	glm::vec3 integral = glm::vec3(0);
 	glm::vec3 abStratSize = quad.ab / (float)NUM_QUAD_SAMPLES_SQRT;
 	glm::vec3 cbStratSize = quad.cb / (float)NUM_QUAD_SAMPLES_SQRT;
+	glm::vec3 integral = glm::vec3(0);
 	for (int i = 0; i < NUM_QUAD_SAMPLES_SQRT * NUM_QUAD_SAMPLES_SQRT; i++) {
-		float u1 = (float)rand() / (float)RAND_MAX;
-		float u2 = (float)rand() / (float)RAND_MAX;
-		glm::vec3 samplePoint = quad.b + (u1 + i / NUM_QUAD_SAMPLES_SQRT) * abStratSize + 
-			                             (u2 + i % NUM_QUAD_SAMPLES_SQRT) * cbStratSize;
+		glm::vec3 samplePoint = quad.b + (getUniformSample() + i / NUM_QUAD_SAMPLES_SQRT) * abStratSize +
+			                             (getUniformSample() + i % NUM_QUAD_SAMPLES_SQRT) * cbStratSize;
 		glm::vec3 incidence = glm::normalize(samplePoint - intersect.point);
 		float lightDist = glm::length(samplePoint - intersect.point);
 		if (!trace(obstruction, intersect.point, incidence, objects) || (lightDist < obstruction.distance + 0.00001f)) {
 			integral += phongBRDF(incidence, -1.f * ray, intersect.normal, intersect.mtl) * 
-				    glm::dot(intersect.normal, incidence) * //n . w_i
-				    glm::dot(-1.f * quad.normal, incidence) //-n_l . w_i
-					/ (lightDist * lightDist);
+				        glm::dot(intersect.normal, incidence) * //n . w_i
+				        glm::dot(-1.f * quad.normal, incidence) //-n_l . w_i
+					    / (lightDist * lightDist);
 		}
 	}
 	radiance = radiance + quad.area / (NUM_QUAD_SAMPLES_SQRT * NUM_QUAD_SAMPLES_SQRT) * integral * quad.radiance;
@@ -131,23 +151,47 @@ glm::vec3 RTRenderer::integrate(unsigned int depth, const Intersect& intersect, 
 	glm::vec3 indirectRadiance = glm::vec3(0);
 	if (depth != 1) {
 		for (int i = 0; i < NUM_INTERSECT_SAMPLES; i++) {
-			glm::vec3 sampledDir = getHemisphericalSample(intersect.normal);
+#ifdef _COSINE_SAMPLING_
+			glm::vec3 sampledDir = getCosineWeightedSample(intersect.normal);
 			if (trace(obstruction, intersect.point, sampledDir, objects)) {
-				indirectRadiance = indirectRadiance + phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl) * 
-					               integrate(depth - 1, obstruction, sampledDir, quad, objects) *
-					               glm::dot(intersect.normal, sampledDir);
+				indirectRadiance += phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl) *
+					integrate(depth - 1, obstruction, sampledDir, quad, objects);
 			}
+#endif
+#ifdef _BRDF_SAMPLING_
+			float specularMean = (intersect.mtl->specular.r + intersect.mtl->specular.g + intersect.mtl->specular.b) / 3.f;
+			float diffuseMean = (intersect.mtl->diffuse.r + intersect.mtl->diffuse.g + intersect.mtl->diffuse.b) / 3.f;
+			float reflectiveness = specularMean / (specularMean + diffuseMean);
+			glm::vec3 reflection = glm::reflect(ray, intersect.normal);
+			glm::vec3 sampledDir = getBRDFImportanceSample(intersect.normal, reflection, reflectiveness, intersect.mtl->specularFocus);
+		
+			if (trace(obstruction, intersect.point, sampledDir, objects)) {
+				float pd = getBRDFPD(sampledDir, intersect.normal, reflection, intersect.mtl->specularFocus, reflectiveness);
+				glm::vec3 brdf = phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl);
+				glm::vec3 Li = integrate(depth - 1, obstruction, sampledDir, quad, objects);
+				float dot = glm::dot(sampledDir, intersect.normal);
+				indirectRadiance += phongBRDF(sampledDir, -1.f * ray, intersect.normal, intersect.mtl)
+					* integrate(depth - 1, obstruction, sampledDir, quad, objects)
+				    * glm::dot(sampledDir, intersect.normal) / pd;
+			}
+#endif
 		}
 	}
-	indirectRadiance = indirectRadiance * 6.2831f / (float)NUM_INTERSECT_SAMPLES;
+#ifdef _COSINE_SAMPLING_
+	indirectRadiance = indirectRadiance * 3.1415f / (float)NUM_INTERSECT_SAMPLES;
+#endif
+#ifdef _BRDF_SAMPLING_
+	indirectRadiance = indirectRadiance / (float)NUM_INTERSECT_SAMPLES;
+#endif
 
 	return glm::clamp(radiance + indirectRadiance, glm::vec3(0.f), glm::vec3(1.f));
 }
 
 glm::vec3 RTRenderer::phongBRDF(const glm::vec3& wi, const glm::vec3& wo, const glm::vec3& normal, Resources::Material* mtl) {
 	float reflectDotWi = std::max(glm::dot(glm::reflect(wo, normal), wi), 0.f);
-	return mtl->diffuse / 3.14159f + mtl->specular * (mtl->specularFocus + 2) / 6.28318f * 
+	glm::vec3 result =  mtl->diffuse / 3.14159f + mtl->specular * (mtl->specularFocus + 2) / 6.28318f * 
 		   glm::pow(reflectDotWi, mtl->specularFocus);
+	return result;
 }
 
 glm::vec3 RTRenderer::shadeFromQuadAnalytically(const glm::vec3& point,
@@ -170,23 +214,60 @@ glm::vec3 RTRenderer::shadeFromQuadAnalytically(const glm::vec3& point,
 	glm::vec3 lambertianBRDF = mtl->diffuse / 3.1415f;
 	glm::vec3 color = lambertianBRDF * quad.radiance * glm::dot(normal, phi);
 	return glm::clamp(color, glm::vec3(0.f), glm::vec3(1.f));
-	//outputColor = TGAColor(255 * color.r, 255 * color.g, 255 * color.b, 255);
+}
+
+
+glm::vec3 RTRenderer::getBRDFImportanceSample(const glm::vec3& normal, const glm::vec3& reflection, float reflectiveness, float specularFocus) {
+	float theta;
+	glm::vec3 hemisphereCenterDir; //sampled hemisphere's center vector
+	if (getUniformSample() <= reflectiveness) {
+		theta = glm::acos(std::powf(getUniformSample(), 1.f / (specularFocus + 1.f)));
+		hemisphereCenterDir = reflection;
+	} 
+	else {
+		theta = glm::acos(std::sqrtf(getUniformSample()));
+		hemisphereCenterDir = normal;
+	}
+	float phi = 6.2831f * getUniformSample();
+	glm::vec3 dir = toHemisphericalDirection(theta, phi, hemisphereCenterDir);
+	return dir;
+
+}
+
+float RTRenderer::getBRDFPD(const glm::vec3& wi, const glm::vec3 & normal, const glm::vec3 & reflection, 
+	                       float specularFocus, float reflectiveness) {
+	float reflectDotWi = std::max(glm::dot(reflection, wi), 0.f);
+	return (1.f - reflectiveness) * glm::dot(normal, wi) / 3.14159f + reflectiveness * (specularFocus + 1.f) / 6.2831f
+		   * std::powf(reflectDotWi, specularFocus);
 }
 
 glm::vec3 RTRenderer::getHemisphericalSample(const glm::vec3 & normal) {
-	//translation from uniform sampling to spherical sampling
-	float theta = glm::acos((float)rand() / (float)RAND_MAX);
-	float phi = 6.2831f * (float)rand() / (float)RAND_MAX;
-	//
+	float theta = glm::acos(getUniformSample());
+	float phi = 6.2831f * getUniformSample();
+	return toHemisphericalDirection(theta, phi, normal);
+}
+
+glm::vec3 RTRenderer::getCosineWeightedSample(const glm::vec3& normal) {
+	float theta = glm::acos(std::sqrtf(getUniformSample()));
+	float phi = 6.2831f * getUniformSample();
+	return toHemisphericalDirection(theta, phi, normal);
+}
+
+float RTRenderer::getUniformSample() {
+	return (float)rand() / (float)RAND_MAX;
+}
+
+glm::vec3 RTRenderer::toHemisphericalDirection(float theta, float phi, const glm::vec3& normal) {
 	float sinTheta = glm::sin(theta);
 	float cosTheta = glm::cos(theta);
 	float sinPhi = glm::sin(phi);
 	float cosPhi = glm::cos(phi);
 	//the hemisphere's y-axis is same as the given normal
-	glm::vec3 xh = glm::normalize(glm::cross(glm::vec3(0.f, 1.f, 0.f), normal)); //hemisphere's x-axix
-	glm::vec3 zh = glm::normalize(glm::cross(normal, xh)); //hemisphere's z-axix
+	glm::vec3 up = glm::vec3(0.f, 0.f, 1.f);
+	glm::vec3 xh = glm::normalize(glm::cross(up, normal)); //hemisphere's x-axix
+	glm::vec3 zh = glm::cross(normal, xh); //hemisphere's z-axix
 	//a hemispherical direction in standard basis is (cosPhi * sinTheta, sinPhi * sinTheta, cosTheta)
-	return glm::normalize(cosPhi * sinTheta * xh + sinPhi * sinTheta * normal + cosTheta * zh);
+	return cosPhi * sinTheta * xh + sinPhi * sinTheta * zh + cosTheta * normal;
 }
 
 

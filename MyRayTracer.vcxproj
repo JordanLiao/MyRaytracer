@@ -97,6 +97,7 @@
     <ClCompile Include="src\Resources.cpp" />
     <ClCompile Include="src\RTRenderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\tgaimage.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -484,6 +485,7 @@
     <ClInclude Include="src\Resources.h" />
     <ClInclude Include="src\RTRenderer.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\tgaimage.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\Window.h" />
