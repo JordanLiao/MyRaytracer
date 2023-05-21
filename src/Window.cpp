@@ -8,12 +8,14 @@ const char* Window::windowTitle = "My Ray Tracer";
 //projection matrix
 double Window::near = 0.1;
 double Window::far = 1000.0;
-double Window::fov = 50.0;
+double Window::fov = 60.0;
 glm::mat4 Window::projection = glm::mat4(1); // initially set to the identity matrix because window size is unknown, resizecallback()
                                              // would give the projection matrix an actual value.
 
 
-GLFWwindow* Window::createWindow(int initWidth, int initHeight) {
+GLFWwindow* Window::createWindow(int initWidth, int initHeight, float fov) {
+	Window::fov = fov;
+
 	// Initialize GLFW.
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -26,7 +28,13 @@ GLFWwindow* Window::createWindow(int initWidth, int initHeight) {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	int xpos, ypos, workAreawidth, workAreaheight;
 	glfwGetMonitorWorkarea(monitor, &xpos, &ypos, &workAreawidth, &workAreaheight);
-	GLFWwindow* window = glfwCreateWindow(workAreawidth, workAreaheight, windowTitle, NULL, NULL);
+
+	if (initWidth < 0 || initHeight < 0) {
+		std::cerr << "Incorrect Window Dimension" << std::endl;
+		return NULL;
+	}
+
+	GLFWwindow* window = glfwCreateWindow(initWidth, initHeight, windowTitle, NULL, NULL);
 	glfwSetWindowPos(window, xpos, ypos + 30);
 	if (!window) {
 		std::cerr << "Failed to open GLFW window." << std::endl;

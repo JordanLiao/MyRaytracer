@@ -1,25 +1,7 @@
-﻿  Main.cpp
-D:\csHobby\MyRayTracer\src\Main.cpp(13,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  RTRenderer.cpp
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(32,36): warning C4018: '<': signed/unsigned mismatch
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,69): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,54): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,39): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
+﻿  Scene.cpp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  2 of 928 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  1 of 1204 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

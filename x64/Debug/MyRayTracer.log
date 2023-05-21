@@ -1,18 +1,5 @@
-﻿  RTRenderer.cpp
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(32,36): warning C4018: '<': signed/unsigned mismatch
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,69): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,54): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
-D:\csHobby\MyRayTracer\src\RTRenderer.cpp(45,39): warning C4244: 'argument': conversion from 'T' to 'const uint8_t', possible loss of data
-          with
-          [
-              T=float
-          ]
+﻿  Main.cpp
+D:\csHobby\MyRayTracer\src\Main.cpp(46,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  RTRenderer.cpp
+  Generating Code...
   MyRayTracer.vcxproj -> D:\csHobby\MyRayTracer\x64\Debug\MyRayTracer.exe

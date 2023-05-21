@@ -2,6 +2,7 @@
 #define _RESOURCEMANAGER_H_
 
 #include "Object.h"
+#include "RayTracer.h"
 #include "GLM/glm.hpp"
 #include "assimp/scene.h"
 #include "assimp/Importer.hpp"
@@ -14,17 +15,21 @@
 #include <unordered_map>
 #include <string>
 
+#define MDF_UNIT_SIZE 0.05f
+#define NUM_MDF_SAMPLE 300
+
 class ResourceManager {
 public:
-	static Object* loadObject(const char* fPath);
+	static Object* loadObject(const char* fPath, bool generateMDF);
 private:
 	//maps object's name(not file path name) to object's address.
 	static std::unordered_map<std::string, Object*> objMap;
 
 	/*
 		Fill the given vertices vectors, given a pMesh reference.
+		returns the max individual values of x,y,z found in the vertices as a vec3
 	*/
-	static void processMeshVertices(aiMesh* pMesh, std::vector<glm::vec3>& vert, std::vector<glm::vec3>& norm, std::vector<glm::vec2>& text);
+	static std::pair<glm::vec3, glm::vec3> processMeshVertices(aiMesh* pMesh, std::vector<glm::vec3>& vert, std::vector<glm::vec3>& norm, std::vector<glm::vec2>& text);
 
 	/*
 		Generate and fill a triangle vector, given a pMesh reference, and three already processed vertices vectors.
@@ -34,6 +39,8 @@ private:
 		                         std::vector<glm::vec2>& text, int vertexOffset);
 
 	static void generateTriangles(std::vector<Triangle*>& triangles, std::vector<glm::ivec3>& indices, std::vector<glm::vec3>& vert, std::vector<glm::vec3>& norm);
+
+	static MeshDistanceField* generateMeshDistanceField(Object* obj);
 
 	static Resources::Material* loadMaterial(const aiMaterial* mtl);
 

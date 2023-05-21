@@ -82,10 +82,10 @@ void EngineApp::cleanUp() {
 
 void EngineApp::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
-		return;
+		keyPressed[key] = true;
 	}
 	else if (action == GLFW_RELEASE) {
-		return;
+		keyPressed[key] = false;
 	}
 }
 

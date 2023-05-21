@@ -9,6 +9,13 @@
 
 #include <iostream>
 
+#ifndef _DEBUG
+#define _MULTITHREADED_
+#define NUM_THREADS 12
+#else
+#define NUM_THREADS 1
+#endif
+
 void clearError();
 bool checkError(const char*, const char*, int);
 

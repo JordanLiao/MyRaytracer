@@ -56,6 +56,8 @@
       <PreprocessorDefinitions>GLEW_STATIC;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(solutionDir)Dependencies\Assimp\include;$(solutionDir)Dependencies\GLEW\include;$(solutionDir)Dependencies;$(solutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <Optimization>Custom</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,6 +75,8 @@
       <PreprocessorDefinitions>GLEW_STATIC;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(solutionDir)Dependencies\Assimp\include;$(solutionDir)Dependencies\GLEW\include;$(solutionDir)Dependencies;$(solutionDir)Dependencies\GLFW\include</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <Optimization>Custom</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,19 +89,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\glm\detail\glm.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\RTCamera.cpp" />
     <ClCompile Include="src\Core.cpp" />
     <ClCompile Include="src\EngineApp.cpp" />
-    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\MeshDistanceField.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\QuadLight.cpp" />
+    <ClCompile Include="src\RayTracer.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Resources.cpp" />
     <ClCompile Include="src\RTRenderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
+    <ClCompile Include="src\Tests.cpp" />
     <ClCompile Include="src\tgaimage.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Window.cpp" />
@@ -473,18 +480,20 @@
     <ClInclude Include="Dependencies\glm\vec3.hpp" />
     <ClInclude Include="Dependencies\glm\vec4.hpp" />
     <ClInclude Include="Dependencies\glm\vector_relational.hpp" />
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Tests.h" />
+    <ClInclude Include="src\RTCamera.h" />
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\EngineApp.h" />
-    <ClInclude Include="src\Light.h" />
-    <ClInclude Include="src\Main.h" />
     <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\MeshDistanceField.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\QuadLight.h" />
+    <ClInclude Include="src\RayTracer.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\Resources.h" />
     <ClInclude Include="src\RTRenderer.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\tgaimage.h" />
     <ClInclude Include="src\Triangle.h" />

@@ -19,12 +19,15 @@ Triangle::Triangle(glm::vec3& p1, glm::vec3& p2, glm::vec3& p3, glm::vec3& n1, g
 }
 
 float Triangle::intersect(glm::vec3& baryCenter, const glm::vec3& raySource, const glm::vec3& ray) {
-	//length of the perpendicular component of the vector from pos to the PLANE that the triangle is on
+	//length of the perpendicular component of the vector from origin to the PLANE that the triangle is on
 	float dist = -1.f * (glm::dot(faceNormal, positions[0]));
+	float normalDotRay = glm::dot(faceNormal, ray);
+	//float t = -1.f * (glm::dot(faceNormal, raySource) + dist) / (glm::dot(faceNormal, ray));
 	//vector length from raySource to the PLANE that the triangle is on
-	float t = -1.f * (glm::dot(faceNormal, raySource) + dist) / (glm::dot(faceNormal, ray));
-	if (t <= 0.00001f)
+	float t = -1.f * (glm::dot(faceNormal, raySource) + dist) / normalDotRay;
+	if(t <= 0.001f) //ray is aiming at opposite direction of the triangle
 		return FLT_MAX;
+
 	glm::vec3 p = raySource + t * ray; //intersection point of the ray on the plane that the triangle is on
 	glm::vec3 v2 = p - positions[0];
 	float d20 = glm::dot(v2, v0);
@@ -37,6 +40,8 @@ float Triangle::intersect(glm::vec3& baryCenter, const glm::vec3& raySource, con
 		return FLT_MAX;
 	else {
 		baryCenter = glm::vec3(u, v, w);
+		//if (normalDotRay > 0.f) //if ray is coming from the back face of the triangle 
+			//t *= -1.f;
 		return t;
 	}
 }
