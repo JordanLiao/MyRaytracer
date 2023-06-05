@@ -12,6 +12,7 @@
 #include "Triangle.h"
 
 #include <vector>
+#include <atomic>
 #include <unordered_map>
 #include <string>
 
@@ -20,8 +21,10 @@
 
 class ResourceManager {
 public:
+	static void initResourceManager();
 	static Object* loadObject(const char* fPath, bool generateMDF);
 private:
+
 	//maps object's name(not file path name) to object's address.
 	static std::unordered_map<std::string, Object*> objMap;
 
@@ -41,6 +44,7 @@ private:
 	static void generateTriangles(std::vector<Triangle*>& triangles, std::vector<glm::ivec3>& indices, std::vector<glm::vec3>& vert, std::vector<glm::vec3>& norm);
 
 	static MeshDistanceField* generateMeshDistanceField(Object* obj);
+	static void scanMDFOnThread(int wIdx, int hIdx, MeshDistanceField* mdf, const std::vector<Object*>& objSpace);
 
 	static Resources::Material* loadMaterial(const aiMaterial* mtl);
 

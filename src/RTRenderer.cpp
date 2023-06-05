@@ -117,6 +117,8 @@ glm::vec3 RTRenderer::integrate(unsigned int depth, const Intersect& intersect, 
 #endif
 #ifdef _BRDF_SAMPLING_
 	indirectRadiance = indirectRadiance / (float)NUM_INTERSECT_SAMPLES;
+	if (isnan(indirectRadiance.x) || isnan(indirectRadiance.y) || isnan(indirectRadiance.z))
+		indirectRadiance = glm::vec3(0.f);
 #endif
 
 	return glm::clamp(radiance + indirectRadiance, glm::vec3(0.f), glm::vec3(1.f));

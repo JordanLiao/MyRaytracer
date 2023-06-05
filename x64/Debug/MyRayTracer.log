@@ -1,5 +1,18 @@
-﻿  Main.cpp
+﻿  EngineApp.cpp
+  Main.cpp
 D:\csHobby\MyRayTracer\src\Main.cpp(46,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  MeshDistanceField.cpp
+D:\csHobby\MyRayTracer\src\MeshDistanceField.cpp(225,47): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Object.cpp
+  QuadLight.cpp
   RTRenderer.cpp
+  RayTracer.cpp
+  ResourceManager.cpp
+  Scene.cpp
+  Tests.cpp
   Generating Code...
+  LINK : D:\csHobby\MyRayTracer\x64\Debug\MyRayTracer.exe not found or not built by the last incremental link; performing full link
+glew32s.lib(glew.obj) : warning LNK4099: PDB '' was not found with 'glew32s.lib(glew.obj)' or at ''; linking object as if no debug info
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   MyRayTracer.vcxproj -> D:\csHobby\MyRayTracer\x64\Debug\MyRayTracer.exe

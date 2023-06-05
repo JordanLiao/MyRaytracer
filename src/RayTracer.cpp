@@ -27,8 +27,6 @@ bool RayTracer::trace(Intersect& intersect, const glm::vec3& raySource, const gl
 		for (size_t j = 0; j < numMesh; j++) {
 			size_t numTriangles = objects[i]->meshList[j]->triangles.size();
 			for (size_t k = 0; k < numTriangles; k++) {
-				//if (k == 10)
-					//std::cout << "break" << std::endl;
 				glm::vec3 bCenter;
 				float dist = objects[i]->meshList[j]->triangles[k].intersect(bCenter, raySource, ray);
 				if (std::abs(dist) < rayLength) {
@@ -37,9 +35,6 @@ bool RayTracer::trace(Intersect& intersect, const glm::vec3& raySource, const gl
 					baryCenter = bCenter;
 					hitTriangle = &(objects[i]->meshList[j]->triangles[k]);
 					intersect.mtl = objects[i]->meshList[j]->material;
-#ifdef _DEBUG
-					intersect.name = &objects[i]->objFileName;
-#endif
 				}
 			}
 		}
@@ -51,9 +46,6 @@ bool RayTracer::trace(Intersect& intersect, const glm::vec3& raySource, const gl
 				rayLength = dist;
 				hitSphere = objects[i]->sphere;
 				intersect.mtl = hitSphere->material;
-#ifdef _DEBUG
-				intersect.name = &objects[i]->objFileName;
-#endif
 			}
 		}
 	}

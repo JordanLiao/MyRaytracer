@@ -45,7 +45,7 @@ void print_versions() {
 int main(int argc, char* argv[]) {
 	srand(time(nullptr));
 	
-	float fov = 50.f;
+	float fov = 60.f;
 #if _DEBUG
 	int width = 3;
 	int height = 3;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 #endif
 	
 	//RTCamera cam = RTCamera(glm::vec3(0.f, 1.5f, 4.f), glm::vec3(0.0f, 1.5f, 0.f), (float)width / (float)height, glm::radians(fov), width, height);
-	RTCamera cam = RTCamera(glm::vec3(0.f, 0.f, 4.f), glm::vec3(0.0f, 0.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), (float)width / (float)height, glm::radians(fov), width, height);
+	RTCamera cam = RTCamera(glm::vec3(0.f, -.38f, 3.f), glm::vec3(0.0f, -.38f, 0.f), glm::vec3(0.f, 1.f, 0.f), (float)width / (float)height, glm::radians(fov), width, height);
 	
 	GLFWwindow* window = Window::createWindow(width, height, fov);
 	if (!window) 
@@ -66,6 +66,8 @@ int main(int argc, char* argv[]) {
 
 	Shader* simpleShader = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");
 	GLuint shaderID = simpleShader->getId();
+
+	ResourceManager::initResourceManager();
 
 	Scene scene;
 	scene.setup();

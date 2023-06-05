@@ -3,8 +3,12 @@
 
 #include <thread>
 #include <fstream>
+#include <deque>
 
 std::unordered_map<std::string, Object*> ResourceManager::objMap;
+
+void ResourceManager::initResourceManager() {
+}
 
 Object* ResourceManager::loadObject(const char* fPath, bool generateMFD) {
 	std::string pathName = std::string(fPath);
@@ -127,9 +131,6 @@ MeshDistanceField* ResourceManager::generateMeshDistanceField(Object* obj) {
 	//if a prebuilt mdf file is found
 	std::ifstream mdfFile(mdfFileName, std::ios::in | std::ios::binary);
 	if (mdfFile.is_open()) {
-		//mdfFile.seekg(0, std::ifstream::end);
-		//int size = mdfFile.tellg() / (sizeof(float) / sizeof(char));
-		//mdf->mdf.resize(size);
 		mdfFile.seekg(0, std::ifstream::beg);
 		mdfFile.read((char*)&(mdf->mdf[0]), mdf->mdf.size() * (sizeof(float) / sizeof(char)));
 		mdfFile.read((char*)&(mdf->normals[0]), mdf->normals.size() * (sizeof(glm::vec3) / sizeof(char)));
@@ -139,9 +140,8 @@ MeshDistanceField* ResourceManager::generateMeshDistanceField(Object* obj) {
 	}
 
 	Intersect intersect;
-	//glm::vec3 startPos = obj->pos - mdf->dimensions / 2.f;
 	glm::vec3 startPos = mdf->lowerPos;
-	std::vector<Object*> objSpace{ obj };
+	std::vector<Object*> objSpace{obj};
 	for (int i = 0; i < mdf->resW; i++) {
 		for (int j = 0; j < mdf->resH; j++) {
 			for (int k = 0; k < mdf->resD; k++) {
@@ -162,6 +162,8 @@ MeshDistanceField* ResourceManager::generateMeshDistanceField(Object* obj) {
 			}
 		}
 	}
+
+
 	mdf->createVisualization();
 
 	std::ofstream fout(mdfFileName, std::ios::out | std::ios::binary);
@@ -170,6 +172,27 @@ MeshDistanceField* ResourceManager::generateMeshDistanceField(Object* obj) {
 	fout.close();
 
 	return mdf;
+}
+
+void ResourceManager::scanMDFOnThread(int wIdx, int hIdx, MeshDistanceField* mdf, const std::vector<Object*>& objSpace) {
+	Intersect intersect;
+	glm::vec3 startPos = mdf->lowerPos;
+	for (int k = 0; k < mdf->resD; k++) {
+		glm::vec3 raySource = startPos + mdf->resUnit * glm::vec3((float)wIdx + 0.5f, (float)hIdx + 0.5f, -1.f * (float)k - 0.5f);
+		float minDist = FLT_MAX;
+		glm::vec3 normal;
+		for (int n = 0; n < NUM_MDF_SAMPLE; n++) {
+			glm::vec3 sample = RayTracer::getSphericalSample();
+			if (RayTracer::trace(intersect, raySource, sample, objSpace)) {
+				if (std::abs(intersect.distance) < std::abs(minDist)) {
+					minDist = (glm::dot(sample, intersect.normal) > 0) ? intersect.distance * -1.f : intersect.distance;
+					normal = intersect.normal;
+				}
+			}
+		}
+		mdf->setDist(wIdx, hIdx, k, minDist);
+		mdf->setNormal(wIdx, hIdx, k, normal);
+	}
 }
 
 Resources::Material* ResourceManager::loadMaterial(const aiMaterial * mtl) {

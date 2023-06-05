@@ -16,6 +16,9 @@ MeshDistanceField::MeshDistanceField(const float& width, const float& height, co
 	resW = calculateResolution(width, resUnit);
 	resH = calculateResolution(height, resUnit);
 	resD = calculateResolution(depth, resUnit);
+
+	maxStep = resW * resH * resD * 10;
+
 	dimensions = glm::vec3(resW * resUnit, resH * resUnit, resD * resUnit);
 	maxDim = glm::max(dimensions.x, dimensions.y, dimensions.z);
 	lowerPos = pos - glm::vec3(dimensions.x, dimensions.y, -1.0f * dimensions.z) / 2.0f;
@@ -28,7 +31,7 @@ MeshDistanceField::MeshDistanceField(const float& width, const float& height, co
 
 float MeshDistanceField::intersect(glm::vec3& hitNormal, const glm::vec3& raySource, const glm::vec3& ray) {
 	if (isInside(raySource)) { //if already inside the MDF AABB, then there is no external distance.
-		return internalIntersect(hitNormal, raySource + INTERSECT_DIST_THRESHOLD * resUnit * ray, ray);
+		return internalIntersect(hitNormal, raySource + 0.1f * ray, ray);
 	}
 
 	float tmin = (lowerPos.x - raySource.x) / ray.x;
@@ -76,14 +79,16 @@ float MeshDistanceField::internalIntersect(glm::vec3& hitNormal, const glm::vec3
 	glm::vec3 normal(0.f);
 	float dist = interpolate(normal, stepPos);
 	float intersectThreshold = INTERSECT_DIST_THRESHOLD * resUnit;
+	int stepCount = 0;
 	//while (glm::length(stepPos - pos) < maxDim / 1.9f) {
-	while (isInside(stepPos)) {
+	while (isInside(stepPos) && stepCount < maxStep) {
 		if (dist < intersectThreshold) {
 			hitNormal = normal;
 			return dist;
 		}
 		stepPos = stepPos + dist * ray;
 		dist = interpolate(normal, stepPos);
+		stepCount++;
 	}
 
 	return FLT_MAX;
@@ -104,15 +109,6 @@ float MeshDistanceField::interpolate(glm::vec3& normal, const glm::vec3& stepPos
 	int lz = std::min((int)(std::floorf(center.z)), resH - 2);
 
 	glm::vec3 c000p = (glm::vec3(lx, ly, lz) + 0.5f) * resUnit;
-
-	/*float d0 = getDistDefaultZero(lx, ly, lz);
-	float d1 = getDistDefaultZero(lx + 1, ly, lz);
-	float d2 = getDistDefaultZero(lx, ly + 1, lz);
-	float d3 = getDistDefaultZero(lx + 1, ly + 1, lz);
-	float d4 = getDistDefaultZero(lx, ly, lz + 1);
-	float d5 = getDistDefaultZero(lx + 1, ly, lz + 1);
-	float d6 = getDistDefaultZero(lx, ly + 1, lz + 1);
-	float d7 = getDistDefaultZero(lx + 1, ly + 1, lz + 1);*/
 
 
 	float xd = std::max((unsignedStepPos.x - c000p.x) / resUnit, 0.f);
